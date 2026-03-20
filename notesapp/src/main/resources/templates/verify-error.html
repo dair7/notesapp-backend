@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oops, Hubo un problema - Notes Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background-color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 50px 40px; max-width: 450px; width: 90%; text-align: center; }
+        .icon { width: 80px; height: 80px; background-color: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; margin: 0 auto 24px; }
+        h1 { color: #0f172a; font-size: 26px; margin: 0 0 16px; }
+        p { color: #64748b; font-size: 16px; line-height: 1.6; margin: 0 0 32px; }
+        .error-message { background-color: #f1f5f9; padding: 16px; border-radius: 8px; color: #475569; font-size: 14px; margin-bottom: 32px; font-family: monospace; }
+        
+        /* X SVG styling */
+        .x-mark { width: 40px; height: 40px; }
+        .x-mark path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">
+            <svg class="x-mark" viewBox="0 0 24 24">
+                <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+        </div>
+        <h1>Enlace Inv&aacute;lido</h1>
+        <p>No pudimos verificar tu cuenta. Es posible que el enlace haya expirado o que tu cuenta ya est&eacute; verificada.</p>
+        
+        <div class="error-message" th:if="${error}" th:text="${error}">
+            Detalle del error ir&aacute; aqu&iacute;.
+        </div>
+        
+        <p style="font-size: 14px; margin-bottom: 0;">Por favor, intenta solicitar un nuevo enlace desde la aplicaci&oacute;n Notes Pro.</p>
+    </div>
+</body>
+</html>

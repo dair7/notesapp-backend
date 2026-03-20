@@ -33,3 +33,10 @@ build/
 .vscode/
 
 .idea/
+
+### Archivos sensibles ###
+application-prod.properties
+application-local.properties
+*.env
+.env
+.env.*

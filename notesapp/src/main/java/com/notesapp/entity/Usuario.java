@@ -33,6 +33,9 @@ public class Usuario {
     @Column(nullable = false, length = 30)
     private RoleType role = RoleType.USER;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isVerified = false;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

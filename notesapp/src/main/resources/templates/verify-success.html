@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Súper, Cuenta Verificada - Notes Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background-color: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 50px 40px; max-width: 450px; width: 90%; text-align: center; }
+        .icon { width: 80px; height: 80px; background-color: #d1fae5; color: #10b981; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; margin: 0 auto 24px; }
+        h1 { color: #0f172a; font-size: 26px; margin: 0 0 16px; }
+        p { color: #64748b; font-size: 16px; line-height: 1.6; margin: 0 0 32px; }
+        .button { display: inline-block; background-color: #2A9D8F; color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; transition: background-color 0.2s; }
+        .button:hover { background-color: #21867a; }
+        
+        /* Checkmark SVG styling */
+        .checkmark { width: 40px; height: 40px; }
+        .checkmark path { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">
+            <svg class="checkmark" viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+        </div>
+        <h1>¡Cuenta Verificada!</h1>
+        <p>Tu correo electr&oacute;nico ha sido confirmado exitosamente. Ya tienes acceso completo a todas las funciones de Notes Pro.</p>
+        <p style="font-size: 14px; margin-bottom: 0;">Puedes cerrar esta p&aacute;gina y volver a la aplicaci&oacute;n para iniciar sesi&oacute;n.</p>
+    </div>
+</body>
+</html>

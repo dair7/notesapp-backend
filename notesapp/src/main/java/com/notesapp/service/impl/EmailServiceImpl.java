@@ -16,15 +16,18 @@ public class EmailServiceImpl implements EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    private static final String RESEND_URL = "https://api.resend.com/emails";
+    private static final String BREVO_URL = "https://api.brevo.com/v3/smtp/email";
 
     private final RestTemplate restTemplate;
 
-    @Value("${resend.api-key}")
+    @Value("${brevo.api-key}")
     private String apiKey;
 
-    @Value("${resend.from:onboarding@resend.dev}")
+    @Value("${brevo.from:nubeart73@gmail.com}")
     private String fromEmail;
+
+    @Value("${brevo.from-name:Notes Pro}")
+    private String fromName;
 
     @Value("${app.base-url:http://localhost:8080}")
     private String appBaseUrl;
@@ -177,24 +180,24 @@ public class EmailServiceImpl implements EmailService {
     public void sendHtmlEmail(String to, String subject, String htmlBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
+        headers.set("api-key", apiKey);
 
         Map<String, Object> payload = Map.of(
-            "from", fromEmail,
-            "to", List.of(to),
+            "sender", Map.of("name", fromName, "email", fromEmail),
+            "to", List.of(Map.of("email", to)),
             "subject", subject,
-            "html", htmlBody
+            "htmlContent", htmlBody
         );
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(RESEND_URL, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(BREVO_URL, request, String.class);
             if (!response.getStatusCode().is2xxSuccessful()) {
-                log.error("Resend respondió con error {}: {}", response.getStatusCode(), response.getBody());
-                throw new RuntimeException("Error al enviar email via Resend: " + response.getBody());
+                log.error("Brevo respondió con error {}: {}", response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Error al enviar email via Brevo: " + response.getBody());
             }
-            log.info("Email enviado correctamente a {} via Resend", to);
+            log.info("Email enviado correctamente a {} via Brevo", to);
         } catch (Exception e) {
             log.error("Fallo al enviar email a {}: {}", to, e.getMessage());
             throw new RuntimeException("Error al enviar el correo: " + e.getMessage(), e);

@@ -1,37 +1,46 @@
 package com.notesapp.service.impl;
 
 import com.notesapp.service.interfaz.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender mailSender;
+    private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    @Value("${spring.mail.username}")
+    private static final String RESEND_URL = "https://api.resend.com/emails";
+
+    private final RestTemplate restTemplate;
+
+    @Value("${resend.api-key}")
+    private String apiKey;
+
+    @Value("${resend.from:onboarding@resend.dev}")
     private String fromEmail;
 
     @Value("${app.base-url:http://localhost:8080}")
     private String appBaseUrl;
 
-    public EmailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    public EmailServiceImpl() {
+        this.restTemplate = new RestTemplate();
     }
+
+    // ── Métodos públicos ────────────────────────────────────────────────────────
 
     @Override
     public void sendVerificationEmail(String to, String token) {
-        String subject = "Notes Pro - Confirma tu cuenta";
-        
-        // URL que se abrirá al dar clic en el botón (tu endpoint de validación)
         String verifyUrl = appBaseUrl + "/api/auth/verify?token=" + token;
 
-        String htmlMessage = "<!DOCTYPE html>"
-            + "<html>"
-            + "<head>"
-            + "<style>"
+        String html = "<!DOCTYPE html>"
+            + "<html><head><style>"
             + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
             + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
             + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
@@ -41,33 +50,26 @@ public class EmailServiceImpl implements EmailService {
             + "  .content p { font-size: 16px; line-height: 1.5; margin-bottom: 30px; }"
             + "  .button { display: inline-block; padding: 14px 32px; background-color: #2A9D8F; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }"
             + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
-            + "</style>"
-            + "</head>"
-            + "<body>"
+            + "</style></head><body>"
             + "  <div class='container'>"
             + "    <div class='header'><h1>Notes Pro</h1></div>"
             + "    <div class='content'>"
-            + "      <h2>¡Bienvenido a tu nuevo espacio!</h2>"
+            + "      <h2>&#161;Bienvenido a tu nuevo espacio!</h2>"
             + "      <p>Estamos muy felices de que te unas a nosotros. Solo falta un peque&ntilde;o paso, por favor verifica tu correo electr&oacute;nico haciendo clic en el bot&oacute;n de abajo para activar tu cuenta.</p>"
             + "      <a href='" + verifyUrl + "' class='button'>Verificar mi cuenta</a>"
             + "      <p style='margin-top: 30px; font-size: 14px; color: #64748b;'>Si no has creado una cuenta en Notes Pro, puedes ignorar este correo.</p>"
             + "    </div>"
             + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
             + "  </div>"
-            + "</body>"
-            + "</html>";
+            + "</body></html>";
 
-        sendHtmlEmail(to, subject, htmlMessage);
+        sendHtmlEmail(to, "Notes Pro - Confirma tu cuenta", html);
     }
 
     @Override
     public void sendWelcomeEmail(String to, String nombre) {
-        String subject = "¡Bienvenido a Notes Pro!";
-
-        String htmlMessage = "<!DOCTYPE html>"
-            + "<html>"
-            + "<head>"
-            + "<style>"
+        String html = "<!DOCTYPE html>"
+            + "<html><head><style>"
             + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
             + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
             + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
@@ -80,40 +82,32 @@ public class EmailServiceImpl implements EmailService {
             + "  .features { background-color: #f8fafc; border-radius: 10px; padding: 20px 30px; margin: 20px 0; text-align: left; }"
             + "  .features li { font-size: 15px; color: #334155; margin-bottom: 10px; list-style: none; padding-left: 4px; }"
             + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
-            + "</style>"
-            + "</head>"
-            + "<body>"
+            + "</style></head><body>"
             + "  <div class='container'>"
             + "    <div class='header'><h1>Notes Pro</h1></div>"
             + "    <div class='content'>"
             + "      <span class='emoji'>&#127881;</span>"
             + "      <h2>&#161;Bienvenido, <span class='highlight'>" + nombre + "</span>!</h2>"
             + "      <p>Tu cuenta ha sido activada exitosamente. Ahora formas parte de <strong>Notes Pro</strong>, tu espacio personal para organizar ideas, notas y recordatorios.</p>"
-            + "      <div class='features'>"
-            + "        <ul>"
-            + "          <li>&#128221; Crea y organiza tus notas f&aacute;cilmente</li>"
-            + "          <li>&#9200; Configura recordatorios para no olvidar nada</li>"
-            + "          <li>&#128274; Tus datos siempre seguros y privados</li>"
-            + "          <li>&#9729; Accede desde cualquier lugar</li>"
-            + "        </ul>"
-            + "      </div>"
+            + "      <div class='features'><ul>"
+            + "        <li>&#128221; Crea y organiza tus notas f&aacute;cilmente</li>"
+            + "        <li>&#9200; Configura recordatorios para no olvidar nada</li>"
+            + "        <li>&#128274; Tus datos siempre seguros y privados</li>"
+            + "        <li>&#9729; Accede desde cualquier lugar</li>"
+            + "      </ul></div>"
             + "      <p style='font-size: 14px; color: #64748b;'>&#161;Esperamos que disfrutes la experiencia!</p>"
             + "    </div>"
             + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
             + "  </div>"
-            + "</body>"
-            + "</html>";
+            + "</body></html>";
 
-        sendHtmlEmail(to, subject, htmlMessage);
+        sendHtmlEmail(to, "¡Bienvenido a Notes Pro!", html);
     }
 
     @Override
     public void sendCredencialesEmail(String to, String nombre, String password) {
-        String subject = "Notes Pro - Tu cuenta ha sido creada";
-
-        String htmlMessage = "<!DOCTYPE html>"
-            + "<html>"
-            + "<head><style>"
+        String html = "<!DOCTYPE html>"
+            + "<html><head><style>"
             + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
             + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
             + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
@@ -125,8 +119,7 @@ public class EmailServiceImpl implements EmailService {
             + "  .credenciales strong { color: #1e293b; }"
             + "  .aviso { font-size: 13px; color: #64748b; margin-top: 24px; }"
             + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
-            + "</style></head>"
-            + "<body>"
+            + "</style></head><body>"
             + "  <div class='container'>"
             + "    <div class='header'><h1>Notes Pro</h1></div>"
             + "    <div class='content'>"
@@ -140,45 +133,71 @@ public class EmailServiceImpl implements EmailService {
             + "    </div>"
             + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
             + "  </div>"
-            + "</body>"
-            + "</html>";
+            + "</body></html>";
 
-        sendHtmlEmail(to, subject, htmlMessage);
+        sendHtmlEmail(to, "Notes Pro - Tu cuenta ha sido creada", html);
     }
 
     @Override
     public void sendPasswordResetEmail(String to, String token) {
-        String subject = "Recuperación de Contraseña - Notes Pro";
-        String message = "Has solicitado restablecer tu contraseña. Usa el siguiente código temporal en la aplicación: \n\n" 
-                + token + "\n\nEste código expira en 1 hora. Si no solicitaste esto, ignora este correo.";
-        sendEmail(to, subject, message);
+        String html = "<!DOCTYPE html>"
+            + "<html><head><style>"
+            + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
+            + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
+            + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
+            + "  .header h1 { color: #ffffff; margin: 0; font-size: 28px; }"
+            + "  .content { padding: 40px 30px; text-align: center; color: #334155; }"
+            + "  .content h2 { color: #1e293b; margin-top: 0; }"
+            + "  .code { background-color: #f0fdf9; border: 2px dashed #2A9D8F; border-radius: 8px; padding: 20px; margin: 24px auto; max-width: 200px; font-size: 28px; font-weight: bold; color: #1e293b; letter-spacing: 4px; }"
+            + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
+            + "</style></head><body>"
+            + "  <div class='container'>"
+            + "    <div class='header'><h1>Notes Pro</h1></div>"
+            + "    <div class='content'>"
+            + "      <h2>&#128274; Recuperaci&oacute;n de Contrase&ntilde;a</h2>"
+            + "      <p>Has solicitado restablecer tu contrase&ntilde;a. Usa el siguiente c&oacute;digo en la aplicaci&oacute;n:</p>"
+            + "      <div class='code'>" + token + "</div>"
+            + "      <p style='font-size: 14px; color: #64748b;'>Este c&oacute;digo expira en 1 hora. Si no solicitaste esto, ignora este correo.</p>"
+            + "    </div>"
+            + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
+            + "  </div>"
+            + "</body></html>";
+
+        sendHtmlEmail(to, "Recuperación de Contraseña - Notes Pro", html);
     }
 
     @Override
     public void sendEmail(String to, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-
-        mailSender.send(message);
+        // Convierte texto plano a HTML simple para usar un solo canal de envío
+        String html = "<pre style='font-family: sans-serif;'>" + body + "</pre>";
+        sendHtmlEmail(to, subject, html);
     }
 
     @Override
     public void sendHtmlEmail(String to, String subject, String htmlBody) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        Map<String, Object> payload = Map.of(
+            "from", fromEmail,
+            "to", List.of(to),
+            "subject", subject,
+            "html", htmlBody
+        );
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+
         try {
-            jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
-            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
-            
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true); // true indicates html
-            
-            mailSender.send(message);
-        } catch (jakarta.mail.MessagingException e) {
-            throw new RuntimeException("Error al enviar el correo HTML: " + e.getMessage(), e);
+            ResponseEntity<String> response = restTemplate.postForEntity(RESEND_URL, request, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("Resend respondió con error {}: {}", response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Error al enviar email via Resend: " + response.getBody());
+            }
+            log.info("Email enviado correctamente a {} via Resend", to);
+        } catch (Exception e) {
+            log.error("Fallo al enviar email a {}: {}", to, e.getMessage());
+            throw new RuntimeException("Error al enviar el correo: " + e.getMessage(), e);
         }
     }
 }

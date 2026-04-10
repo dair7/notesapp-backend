@@ -38,6 +38,14 @@ public class Nota {
     @Column(name = "es_anclada", nullable = false, columnDefinition = "boolean default false")
     private boolean esAnclada = false;
 
+    // Color de fondo de la nota en formato hex (ej: "#FFE5B4"), nullable
+    @Column(length = 50)
+    private String color;
+
+    // Etiquetas separadas por coma (ej: "trabajo,personal"), nullable
+    @Column(columnDefinition = "TEXT")
+    private String etiquetas;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id",  nullable = false)
     private Usuario usuario;

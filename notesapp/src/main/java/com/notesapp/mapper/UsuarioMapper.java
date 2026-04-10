@@ -23,7 +23,9 @@ public class UsuarioMapper {
         dto.setNombre(usuario.getNombre());
         dto.setEmail(usuario.getEmail());
         dto.setRole(usuario.getRole());
+        dto.setEstadoUsuario(usuario.getEstadoUsuario());
         dto.setCreatedAt(usuario.getCreatedAt());
+        dto.setUltimaConexion(usuario.getUltimaConexion());
 
         return dto;
     }

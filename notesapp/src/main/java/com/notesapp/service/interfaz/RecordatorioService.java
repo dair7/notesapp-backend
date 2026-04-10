@@ -17,5 +17,7 @@ public interface RecordatorioService {
 
     RecordatorioResponseDTO marcarComoCompletado(Long recordatorioId);
 
+    RecordatorioResponseDTO actualizarFecha(Long recordatorioId, RecordatorioRequestDTO dto);
+
     void eliminarRecordatorio(Long recordatorioId);
 }

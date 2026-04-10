@@ -16,4 +16,10 @@ public class NotaRequestDTO {
     private String titulo;
 
     private String contenido;
+
+    // Color de fondo en formato hex (ej: "#FFE5B4"), opcional
+    private String color;
+
+    // Etiquetas separadas por coma, opcional
+    private String etiquetas;
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,10 @@ public class Recordatorio {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean completado = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'MEDIA'")
+    private Prioridad prioridad = Prioridad.MEDIA;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nota_id", nullable = false)

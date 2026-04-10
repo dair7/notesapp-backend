@@ -12,6 +12,8 @@ public class NotaMapper {
         Nota nota = new Nota();
         nota.setTitulo(dto.getTitulo());
         nota.setContenido(dto.getContenido());
+        nota.setColor(dto.getColor());
+        nota.setEtiquetas(dto.getEtiquetas());
         nota.setUsuario(usuario);
 
         return nota;
@@ -26,6 +28,8 @@ public class NotaMapper {
         dto.setFechaCreacion(nota.getFechaCreacion());
         dto.setEstado(nota.getEstado());
         dto.setEsAnclada(nota.isEsAnclada());
+        dto.setColor(nota.getColor());
+        dto.setEtiquetas(nota.getEtiquetas());
 
         if (nota.getUsuario() != null) {
             dto.setUsuarioId(nota.getUsuario().getId());

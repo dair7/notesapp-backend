@@ -1,5 +1,6 @@
 package com.notesapp.dto.auth;
 
+import com.notesapp.validation.ValidPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,6 +22,6 @@ public class RegisterRequestDTO {
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, max = 100, message = "La contraseña debe tener al menos 6 caracteres")
+    @ValidPassword
     private String password;
 }

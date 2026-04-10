@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,11 @@ public interface RecordatorioRepository extends JpaRepository<Recordatorio, Long
     List<Recordatorio> findPendientesByUsuarioId(@Param("usuarioId") Long usuarioId);
 
     void deleteByNotaUsuarioId(Long usuarioId);
+
+    // Conteo por estado de completado (para estadísticas del dashboard)
+    long countByCompletado(boolean completado);
+
+    // Recordatorios cuya fecha ya llegó y aún no fueron notificados
+    @Query("SELECT r FROM Recordatorio r WHERE r.fecha <= :ahora AND r.completado = false")
+    List<Recordatorio> findVencidosYPendientes(@Param("ahora") LocalDateTime ahora);
 }

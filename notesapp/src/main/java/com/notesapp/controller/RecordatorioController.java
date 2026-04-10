@@ -50,6 +50,14 @@ public class RecordatorioController {
         return ResponseEntity.ok(recordatorioService.obtenerPendientesPorUsuario(usuarioId));
     }
 
+    // Actualizar fecha de un recordatorio
+    @PutMapping("/{id}")
+    public ResponseEntity<RecordatorioResponseDTO> actualizarFecha(
+            @PathVariable Long id,
+            @Valid @RequestBody RecordatorioRequestDTO dto) {
+        return ResponseEntity.ok(recordatorioService.actualizarFecha(id, dto));
+    }
+
     // Marcar como completado / desmarcar (toggle)
     @PutMapping("/{id}/completar")
     public ResponseEntity<RecordatorioResponseDTO> toggleCompletado(

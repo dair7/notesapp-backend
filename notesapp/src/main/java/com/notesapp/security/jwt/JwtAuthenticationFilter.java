@@ -43,6 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
+            // Si la cuenta está INACTIVA (isEnabled=false) no se autentica:
+            // Spring Security devolverá 401 automáticamente via authenticationEntryPoint
+            if (!userDetails.isEnabled()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,

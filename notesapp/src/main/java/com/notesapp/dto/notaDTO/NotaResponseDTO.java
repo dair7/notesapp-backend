@@ -20,4 +20,6 @@ public class NotaResponseDTO {
     private boolean esAnclada;
     private Long usuarioId;
     private String usuarioNombre;
+    private String color;
+    private String etiquetas;
 }

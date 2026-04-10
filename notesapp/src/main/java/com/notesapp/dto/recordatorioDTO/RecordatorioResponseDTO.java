@@ -1,5 +1,6 @@
 package com.notesapp.dto.recordatorioDTO;
 
+import com.notesapp.entity.Prioridad;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,4 +17,5 @@ public class RecordatorioResponseDTO {
     private Boolean completado;
     private Long notaId;
     private String notaTitulo;
+    private Prioridad prioridad;
 }

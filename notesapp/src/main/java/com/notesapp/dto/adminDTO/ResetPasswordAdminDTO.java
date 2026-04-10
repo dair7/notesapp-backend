@@ -1,4 +1,4 @@
-package com.notesapp.dto.usuarioDTO;
+package com.notesapp.dto.adminDTO;
 
 import com.notesapp.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
@@ -9,12 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangePasswordDTO {
-
-    @NotBlank(message = "La contraseña actual es obligatoria")
-    private String currentPassword;
+public class ResetPasswordAdminDTO {
 
     @NotBlank(message = "La nueva contraseña es obligatoria")
     @ValidPassword
-    private String newPassword;
+    private String nuevaPassword;
 }

@@ -1,6 +1,7 @@
 package com.notesapp.security;
 
 import com.notesapp.entity.Usuario;
+import com.notesapp.enums.EstadoUsuario;
 import com.notesapp.repository.UsuarioRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -27,11 +28,17 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Usuario no encontrado con email: " + email));
 
-        // Convertimos nuestro Usuario de la DB al UserDetails de Spring Security
-        // El rol se agrega con prefijo "ROLE_" para que funcione con hasRole()
+        // isEnabled refleja si la cuenta está ACTIVA o INACTIVA
+        // El filtro JWT revisa este flag antes de autenticar cada request
+        boolean enabled = usuario.getEstadoUsuario() == EstadoUsuario.ACTIVO;
+
         return new User(
                 usuario.getEmail(),
                 usuario.getPassword(),
+                enabled,
+                true,  // accountNonExpired
+                true,  // credentialsNonExpired
+                true,  // accountNonLocked
                 Collections.singletonList(
                         new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name())));
     }

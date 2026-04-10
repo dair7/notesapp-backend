@@ -1,6 +1,8 @@
 package com.notesapp.service.impl;
 
 import com.notesapp.service.interfaz.EmailService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -54,6 +56,89 @@ public class EmailServiceImpl implements EmailService {
             + "  </div>"
             + "</body>"
             + "</html>";
+
+        sendHtmlEmail(to, subject, htmlMessage);
+    }
+
+    @Override
+    public void sendWelcomeEmail(String to, String nombre) {
+        String subject = "¡Bienvenido a Notes Pro!";
+
+        String htmlMessage = "<!DOCTYPE html>"
+            + "<html>"
+            + "<head>"
+            + "<style>"
+            + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
+            + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
+            + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
+            + "  .header h1 { color: #ffffff; margin: 0; font-size: 28px; }"
+            + "  .content { padding: 40px 30px; text-align: center; color: #334155; }"
+            + "  .content h2 { color: #1e293b; font-size: 22px; margin-top: 0; }"
+            + "  .content p { font-size: 16px; line-height: 1.5; margin-bottom: 20px; }"
+            + "  .emoji { font-size: 48px; margin-bottom: 16px; display: block; }"
+            + "  .highlight { color: #2A9D8F; font-weight: bold; }"
+            + "  .features { background-color: #f8fafc; border-radius: 10px; padding: 20px 30px; margin: 20px 0; text-align: left; }"
+            + "  .features li { font-size: 15px; color: #334155; margin-bottom: 10px; list-style: none; padding-left: 4px; }"
+            + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
+            + "</style>"
+            + "</head>"
+            + "<body>"
+            + "  <div class='container'>"
+            + "    <div class='header'><h1>Notes Pro</h1></div>"
+            + "    <div class='content'>"
+            + "      <span class='emoji'>&#127881;</span>"
+            + "      <h2>&#161;Bienvenido, <span class='highlight'>" + nombre + "</span>!</h2>"
+            + "      <p>Tu cuenta ha sido activada exitosamente. Ahora formas parte de <strong>Notes Pro</strong>, tu espacio personal para organizar ideas, notas y recordatorios.</p>"
+            + "      <div class='features'>"
+            + "        <ul>"
+            + "          <li>&#128221; Crea y organiza tus notas f&aacute;cilmente</li>"
+            + "          <li>&#9200; Configura recordatorios para no olvidar nada</li>"
+            + "          <li>&#128274; Tus datos siempre seguros y privados</li>"
+            + "          <li>&#9729; Accede desde cualquier lugar</li>"
+            + "        </ul>"
+            + "      </div>"
+            + "      <p style='font-size: 14px; color: #64748b;'>&#161;Esperamos que disfrutes la experiencia!</p>"
+            + "    </div>"
+            + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
+            + "  </div>"
+            + "</body>"
+            + "</html>";
+
+        sendHtmlEmail(to, subject, htmlMessage);
+    }
+
+    @Override
+    public void sendReminderEmail(String to, String nombreUsuario, String tituloNota, LocalDateTime fecha) {
+        String subject = "Notes Pro - Recordatorio: " + tituloNota;
+        String fechaFormateada = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'a las' HH:mm"));
+
+        String htmlMessage = "<!DOCTYPE html>"
+            + "<html><head><style>"
+            + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
+            + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
+            + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
+            + "  .header h1 { color: #ffffff; margin: 0; font-size: 28px; }"
+            + "  .content { padding: 40px 30px; text-align: center; color: #334155; }"
+            + "  .content h2 { color: #1e293b; font-size: 22px; margin-top: 0; }"
+            + "  .nota-box { background-color: #f0fdf9; border-left: 4px solid #2A9D8F; border-radius: 8px; padding: 16px 20px; margin: 20px 0; text-align: left; }"
+            + "  .nota-box p { margin: 0; font-size: 16px; color: #334155; }"
+            + "  .fecha { font-size: 14px; color: #64748b; margin-top: 8px; }"
+            + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
+            + "</style></head><body>"
+            + "  <div class='container'>"
+            + "    <div class='header'><h1>Notes Pro</h1></div>"
+            + "    <div class='content'>"
+            + "      <h2>&#9200; Tienes un recordatorio, " + nombreUsuario + "</h2>"
+            + "      <p>Este es el recordatorio que configuraste para la siguiente nota:</p>"
+            + "      <div class='nota-box'>"
+            + "        <p><strong>" + tituloNota + "</strong></p>"
+            + "        <p class='fecha'>&#128197; Programado para el " + fechaFormateada + "</p>"
+            + "      </div>"
+            + "      <p style='font-size: 14px; color: #64748b;'>Abre la app para ver el contenido completo de tu nota.</p>"
+            + "    </div>"
+            + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
+            + "  </div>"
+            + "</body></html>";
 
         sendHtmlEmail(to, subject, htmlMessage);
     }

@@ -4,38 +4,43 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Filtro simple de rate limiting para proteger endpoints sensibles
- * como login y forgot-password contra ataques de fuerza bruta.
- * 
- * Limita a MAX_REQUESTS intentos por IP en una ventana de WINDOW_MS milisegundos.
+ * Filtro de rate limiting respaldado por Redis.
+ * Los contadores persisten entre reinicios del servidor y se comparten
+ * entre múltiples instancias (escalado horizontal).
+ *
+ * Estrategia: ventana fija de WINDOW_MINUTES minutos por IP + endpoint.
+ * El TTL de la clave Redis actúa como reset automático de la ventana.
  */
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    // Máximo de intentos por ventana de tiempo
     private static final int MAX_REQUESTS = 10;
-    // Ventana de tiempo en milisegundos (15 minutos)
-    private static final long WINDOW_MS = 15 * 60 * 1000;
+    private static final long WINDOW_MINUTES = 15;
 
-    // Almacén de intentos por IP
-    private final Map<String, RateLimitEntry> attempts = new ConcurrentHashMap<>();
+    // Prefijo para las claves en Redis
+    private static final String KEY_PREFIX = "rate_limit:";
 
-    // Endpoints protegidos
+    // Endpoints protegidos contra fuerza bruta
     private static final String[] PROTECTED_PATHS = {
             "/api/auth/login",
             "/api/auth/forgot-password",
             "/api/auth/reset-password"
     };
+
+    private final StringRedisTemplate redisTemplate;
+
+    public RateLimitFilter(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -45,27 +50,30 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Solo aplicar rate limiting a endpoints sensibles y método POST
         if ("POST".equalsIgnoreCase(request.getMethod()) && isProtectedPath(path)) {
-            String clientIp = getClientIp(request);
-            String key = clientIp + ":" + path;
+            try {
+                String clientIp = getClientIp(request);
+                String redisKey = KEY_PREFIX + clientIp + ":" + path;
 
-            RateLimitEntry entry = attempts.compute(key, (k, existing) -> {
-                long now = System.currentTimeMillis();
-                if (existing == null || (now - existing.windowStart) > WINDOW_MS) {
-                    return new RateLimitEntry(now); // Nueva ventana
+                // Incrementar el contador; si es la primera vez, establecer TTL
+                Long intentos = redisTemplate.opsForValue().increment(redisKey);
+
+                if (intentos != null && intentos == 1) {
+                    // Primera petición de esta ventana: fijar expiración de 15 minutos
+                    redisTemplate.expire(redisKey, WINDOW_MINUTES, TimeUnit.MINUTES);
                 }
-                existing.count.incrementAndGet();
-                return existing;
-            });
 
-            if (entry.count.get() > MAX_REQUESTS) {
-                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                response.setContentType("application/json");
-                response.getWriter().write(
-                        "{\"status\":429,\"error\":\"Too Many Requests\","
-                                + "\"mensaje\":\"Demasiados intentos. Espera 15 minutos antes de intentar de nuevo.\"}");
-                return;
+                if (intentos != null && intentos > MAX_REQUESTS) {
+                    response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                            "{\"status\":429,\"error\":\"Too Many Requests\","
+                                    + "\"mensaje\":\"Demasiados intentos. Espera 15 minutos antes de intentar de nuevo.\"}");
+                    return;
+                }
+            } catch (Exception e) {
+                // Si Redis no está disponible, se permite la petición (fail-open)
+                logger.warn("Redis no disponible, omitiendo rate limiting: " + e.getMessage());
             }
         }
 
@@ -85,16 +93,5 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
-    }
-
-    // Estructura interna para rastrear intentos
-    private static class RateLimitEntry {
-        final long windowStart;
-        final AtomicInteger count;
-
-        RateLimitEntry(long windowStart) {
-            this.windowStart = windowStart;
-            this.count = new AtomicInteger(1);
-        }
     }
 }

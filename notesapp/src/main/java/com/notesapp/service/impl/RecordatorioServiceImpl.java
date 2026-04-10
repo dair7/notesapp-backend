@@ -90,6 +90,18 @@ public class RecordatorioServiceImpl implements RecordatorioService {
     }
 
     @Override
+    public RecordatorioResponseDTO actualizarFecha(Long recordatorioId, RecordatorioRequestDTO dto) {
+        Recordatorio recordatorio = recordatorioRepository.findById(recordatorioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recordatorio", "id", recordatorioId));
+
+        verificarPropietarioNota(recordatorio.getNota());
+
+        recordatorio.setFecha(dto.getFecha());
+        Recordatorio actualizado = recordatorioRepository.save(recordatorio);
+        return RecordatorioMapper.toResponseDTO(actualizado);
+    }
+
+    @Override
     public void eliminarRecordatorio(Long recordatorioId) {
         Recordatorio recordatorio = recordatorioRepository.findById(recordatorioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recordatorio", "id", recordatorioId));

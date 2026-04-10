@@ -101,6 +101,8 @@ public class NotaServiceImpl implements NotaService {
 
         nota.setTitulo(dto.getTitulo());
         nota.setContenido(dto.getContenido());
+        nota.setColor(dto.getColor());
+        nota.setEtiquetas(dto.getEtiquetas());
 
         Nota notaActualizada = notaRepository.save(nota);
         return NotaMapper.toResponseDTO(notaActualizada);

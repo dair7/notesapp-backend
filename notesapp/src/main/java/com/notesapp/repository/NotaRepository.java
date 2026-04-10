@@ -26,4 +26,17 @@ public interface NotaRepository extends JpaRepository<Nota, Long> {
             @Param("query") String query);
 
     void deleteByUsuarioId(Long usuarioId);
+
+    // Conteo por estado (para estadísticas del dashboard)
+    long countByEstado(EstadoNoteType estado);
+
+    // Conteo total de notas de un usuario (para la tabla de usuarios admin)
+    long countByUsuarioId(Long usuarioId);
+
+    // Notas creadas por mes — últimos N meses (para gráfica del dashboard)
+    @Query(value = "SELECT TO_CHAR(fecha_creacion, 'YYYY-MM') AS mes, COUNT(*) AS cantidad " +
+                   "FROM notas WHERE fecha_creacion >= :fechaInicio " +
+                   "GROUP BY TO_CHAR(fecha_creacion, 'YYYY-MM') " +
+                   "ORDER BY mes ASC", nativeQuery = true)
+    List<Object[]> contarPorMes(@Param("fechaInicio") java.time.LocalDateTime fechaInicio);
 }

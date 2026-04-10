@@ -12,6 +12,7 @@ public class RecordatorioMapper {
         Recordatorio recordatorio = new Recordatorio();
         recordatorio.setFecha(dto.getFecha());
         recordatorio.setNota(nota);
+        recordatorio.setPrioridad(dto.getPrioridad() != null ? dto.getPrioridad() : com.notesapp.entity.Prioridad.MEDIA);
 
         return recordatorio;
     }
@@ -22,6 +23,7 @@ public class RecordatorioMapper {
         dto.setId(recordatorio.getId());
         dto.setFecha(recordatorio.getFecha());
         dto.setCompletado(recordatorio.getCompletado());
+        dto.setPrioridad(recordatorio.getPrioridad());
 
         if (recordatorio.getNota() != null) {
             dto.setNotaId(recordatorio.getNota().getId());

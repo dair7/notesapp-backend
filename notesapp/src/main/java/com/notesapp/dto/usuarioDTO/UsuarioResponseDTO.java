@@ -1,5 +1,6 @@
 package com.notesapp.dto.usuarioDTO;
 
+import com.notesapp.enums.EstadoUsuario;
 import com.notesapp.enums.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,5 +17,8 @@ public class UsuarioResponseDTO {
     private String nombre;
     private String email;
     private RoleType role;
+    private EstadoUsuario estadoUsuario;
     private LocalDateTime createdAt;
+    private LocalDateTime ultimaConexion;
+    private long cantidadNotas;
 }

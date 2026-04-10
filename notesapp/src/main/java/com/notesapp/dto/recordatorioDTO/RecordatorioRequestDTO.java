@@ -1,5 +1,6 @@
 package com.notesapp.dto.recordatorioDTO;
 
+import com.notesapp.entity.Prioridad;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class RecordatorioRequestDTO {
 
-    @NotNull(message = "La fecha del recordatorio es obligatoria")
-    @Future(message = "La fecha del recordatorio debe ser en el futuro")
+    @NotNull(message = "La fecha de la tarea es obligatoria")
+    @Future(message = "La fecha de la tarea debe ser en el futuro")
     private LocalDateTime fecha;
+
+    private Prioridad prioridad = Prioridad.MEDIA;
 }

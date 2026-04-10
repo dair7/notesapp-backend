@@ -1,5 +1,6 @@
 package com.notesapp.entity;
 
+import com.notesapp.enums.EstadoUsuario;
 import com.notesapp.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,17 @@ public class Usuario {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isVerified = false;
 
+    // Estado de la cuenta: ACTIVO (puede entrar) / INACTIVO (baja lógica)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_usuario", nullable = false, length = 20,
+            columnDefinition = "varchar(20) not null default 'ACTIVO'")
+    private EstadoUsuario estadoUsuario = EstadoUsuario.ACTIVO;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // Se actualiza en cada login exitoso
+    @Column(name = "ultima_conexion")
+    private LocalDateTime ultimaConexion;
 }

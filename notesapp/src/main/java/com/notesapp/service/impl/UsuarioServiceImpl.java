@@ -4,9 +4,11 @@ import com.notesapp.dto.usuarioDTO.UsuarioRequestDTO;
 import com.notesapp.dto.usuarioDTO.UsuarioResponseDTO;
 import com.notesapp.entity.Usuario;
 import com.notesapp.enums.RoleType;
+import com.notesapp.exception.AccessDeniedException;
 import com.notesapp.exception.EmailAlreadyExistsException;
 import com.notesapp.exception.ResourceNotFoundException;
 import com.notesapp.mapper.UsuarioMapper;
+import com.notesapp.security.SecurityUtils;
 import com.notesapp.repository.*;
 import com.notesapp.service.interfaz.UsuarioService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,22 +43,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.recordatorioRepository = recordatorioRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
-    }
-
-    // ── Registro público (siempre rol USER) ──────────────
-    @Override
-    public UsuarioResponseDTO crearUsuario(UsuarioRequestDTO dto) {
-
-        if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailAlreadyExistsException(dto.getEmail());
-        }
-
-        Usuario usuario = UsuarioMapper.toEntity(dto);
-        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
-        usuario.setRole(RoleType.USER); // Forzar rol USER
-
-        Usuario guardado = usuarioRepository.save(usuario);
-        return UsuarioMapper.toResponseDTO(guardado);
     }
 
     // ── Crear admin (solo desde AdminController) ─────────
@@ -143,5 +129,18 @@ public class UsuarioServiceImpl implements UsuarioService {
         
         // 4. Usuario
         usuarioRepository.delete(usuario);
+    }
+
+    // ── Verificar que el usuario autenticado es el propietario ──
+    @Override
+    public void verificarAccesoPropietario(Long id) {
+        if (SecurityUtils.isAdmin()) return;
+
+        String emailAuth = SecurityUtils.getAuthenticatedEmail();
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+
+        if (usuario == null || !usuario.getEmail().equals(emailAuth)) {
+            throw new AccessDeniedException("No tienes permiso para acceder al perfil de otro usuario");
+        }
     }
 }

@@ -117,4 +117,11 @@ public class AdminController {
     public ResponseEntity<List<NotaResponseDTO>> obtenerNotasDeUsuario(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.obtenerNotasDeUsuario(id));
     }
+
+    // ── Contar usuarios activos sin conectarse en los últimos N meses ──
+    @GetMapping("/usuarios/inactivos-por-tiempo")
+    public ResponseEntity<Long> contarInactivosPorTiempo(
+            @RequestParam(defaultValue = "3") int meses) {
+        return ResponseEntity.ok(adminService.contarInactivosPorTiempo(meses));
+    }
 }

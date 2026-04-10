@@ -34,4 +34,7 @@ public interface AdminService {
 
     // Obtener todas las notas de un usuario específico
     List<NotaResponseDTO> obtenerNotasDeUsuario(Long usuarioId);
+
+    // Contar usuarios activos sin conectarse en los últimos N meses
+    long contarInactivosPorTiempo(int meses);
 }

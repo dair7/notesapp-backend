@@ -204,4 +204,14 @@ public class AdminServiceImpl implements AdminService {
                 .map(NotaMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long contarInactivosPorTiempo(int meses) {
+        java.time.LocalDateTime limite = java.time.LocalDateTime.now().minusMonths(meses);
+        return usuarioRepository.findInactivosPorTiempo(
+                RoleType.SUPER_ADMIN,
+                EstadoUsuario.ACTIVO,
+                limite
+        ).size();
+    }
 }

@@ -39,4 +39,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
                    "GROUP BY TO_CHAR(created_at, 'YYYY-MM') " +
                    "ORDER BY mes ASC", nativeQuery = true)
     List<Object[]> contarPorMes(@Param("fechaInicio") java.time.LocalDateTime fechaInicio);
+
+    // Usuarios activos que llevan más de N meses sin conectarse (para alerta de inactividad)
+    @Query("SELECT u FROM Usuario u WHERE u.role <> :rolExcluido " +
+           "AND u.estadoUsuario = :estado " +
+           "AND (u.ultimaConexion IS NULL OR u.ultimaConexion < :limite)")
+    List<Usuario> findInactivosPorTiempo(
+            @Param("rolExcluido") RoleType rolExcluido,
+            @Param("estado") com.notesapp.enums.EstadoUsuario estado,
+            @Param("limite") java.time.LocalDateTime limite);
 }

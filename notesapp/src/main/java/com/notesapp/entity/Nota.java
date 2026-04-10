@@ -21,10 +21,10 @@ public class Nota {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "titulo", nullable = false, length = 200)
     private String titulo;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "contenido", columnDefinition = "TEXT")
     private String contenido;
 
     @CreationTimestamp
@@ -32,18 +32,18 @@ public class Nota {
     private LocalDateTime fechaCreacion;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar default 'ACTIVA'")
+    @Column(name = "estado", nullable = false, columnDefinition = "varchar(20) default 'ACTIVA'")
     private EstadoNoteType estado = EstadoNoteType.ACTIVA;
 
     @Column(name = "es_anclada", nullable = false, columnDefinition = "boolean default false")
     private boolean esAnclada = false;
 
     // Color de fondo de la nota en formato hex (ej: "#FFE5B4"), nullable
-    @Column(length = 50)
+    @Column(name = "color", length = 50)
     private String color;
 
     // Etiquetas separadas por coma (ej: "trabajo,personal"), nullable
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "etiquetas", columnDefinition = "TEXT")
     private String etiquetas;
 
     @ManyToOne(fetch = FetchType.LAZY)

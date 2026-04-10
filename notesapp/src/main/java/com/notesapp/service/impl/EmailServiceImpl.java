@@ -1,9 +1,6 @@
 package com.notesapp.service.impl;
 
 import com.notesapp.service.interfaz.EmailService;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,14 +9,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     @Value("${app.base-url:http://localhost:8080}")
-    private String appBaseUrl; 
+    private String appBaseUrl;
+
+    public EmailServiceImpl(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     @Override
     public void sendVerificationEmail(String to, String token) {
@@ -108,37 +108,40 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendReminderEmail(String to, String nombreUsuario, String tituloNota, LocalDateTime fecha) {
-        String subject = "Notes Pro - Recordatorio: " + tituloNota;
-        String fechaFormateada = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'a las' HH:mm"));
+    public void sendCredencialesEmail(String to, String nombre, String password) {
+        String subject = "Notes Pro - Tu cuenta ha sido creada";
 
         String htmlMessage = "<!DOCTYPE html>"
-            + "<html><head><style>"
+            + "<html>"
+            + "<head><style>"
             + "  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }"
             + "  .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }"
             + "  .header { background-color: #2A9D8F; padding: 30px 20px; text-align: center; }"
             + "  .header h1 { color: #ffffff; margin: 0; font-size: 28px; }"
-            + "  .content { padding: 40px 30px; text-align: center; color: #334155; }"
+            + "  .content { padding: 40px 30px; color: #334155; }"
             + "  .content h2 { color: #1e293b; font-size: 22px; margin-top: 0; }"
-            + "  .nota-box { background-color: #f0fdf9; border-left: 4px solid #2A9D8F; border-radius: 8px; padding: 16px 20px; margin: 20px 0; text-align: left; }"
-            + "  .nota-box p { margin: 0; font-size: 16px; color: #334155; }"
-            + "  .fecha { font-size: 14px; color: #64748b; margin-top: 8px; }"
+            + "  .credenciales { background-color: #f0fdf9; border-left: 4px solid #2A9D8F; border-radius: 8px; padding: 20px 24px; margin: 24px 0; }"
+            + "  .credenciales p { margin: 8px 0; font-size: 15px; color: #334155; }"
+            + "  .credenciales strong { color: #1e293b; }"
+            + "  .aviso { font-size: 13px; color: #64748b; margin-top: 24px; }"
             + "  .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }"
-            + "</style></head><body>"
+            + "</style></head>"
+            + "<body>"
             + "  <div class='container'>"
             + "    <div class='header'><h1>Notes Pro</h1></div>"
             + "    <div class='content'>"
-            + "      <h2>&#9200; Tienes un recordatorio, " + nombreUsuario + "</h2>"
-            + "      <p>Este es el recordatorio que configuraste para la siguiente nota:</p>"
-            + "      <div class='nota-box'>"
-            + "        <p><strong>" + tituloNota + "</strong></p>"
-            + "        <p class='fecha'>&#128197; Programado para el " + fechaFormateada + "</p>"
+            + "      <h2>&#128075; Hola, " + nombre + "</h2>"
+            + "      <p>Un administrador ha creado una cuenta para ti en <strong>Notes Pro</strong>. Estas son tus credenciales de acceso:</p>"
+            + "      <div class='credenciales'>"
+            + "        <p><strong>&#128231; Correo:</strong> " + to + "</p>"
+            + "        <p><strong>&#128274; Contrase&ntilde;a:</strong> " + password + "</p>"
             + "      </div>"
-            + "      <p style='font-size: 14px; color: #64748b;'>Abre la app para ver el contenido completo de tu nota.</p>"
+            + "      <p class='aviso'>Por seguridad, te recomendamos cambiar tu contrase&ntilde;a despu&eacute;s de tu primer inicio de sesi&oacute;n.</p>"
             + "    </div>"
             + "    <div class='footer'>&copy; 2026 Notes Pro. Todos los derechos reservados.</div>"
             + "  </div>"
-            + "</body></html>";
+            + "</body>"
+            + "</html>";
 
         sendHtmlEmail(to, subject, htmlMessage);
     }

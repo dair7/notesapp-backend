@@ -5,8 +5,7 @@ import com.notesapp.dto.auth.LoginRequestDTO;
 import com.notesapp.dto.auth.RegisterRequestDTO;
 import com.notesapp.dto.auth.ResetPasswordRequestDTO;
 
-import java.util.Map;
-import com.notesapp.exception.BadRequestException;
+import com.notesapp.dto.auth.RefreshTokenRequestDTO;
 import com.notesapp.service.interfaz.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -40,15 +39,15 @@ public class AuthController {
     // ── POST /api/auth/refresh-token ─────────────────────
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponseDTO> refreshToken(
-            @RequestBody Map<String, String> body) {
-        return ResponseEntity.ok(authService.renovarToken(body.get("refreshToken")));
+            @Valid @RequestBody RefreshTokenRequestDTO dto) {
+        return ResponseEntity.ok(authService.renovarToken(dto.getRefreshToken()));
     }
 
     // ── POST /api/auth/logout ────────────────────────────
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
-            @RequestBody Map<String, String> body) {
-        authService.cerrarSesion(body.get("refreshToken"));
+            @Valid @RequestBody RefreshTokenRequestDTO dto) {
+        authService.cerrarSesion(dto.getRefreshToken());
         return ResponseEntity.ok("Sesión cerrada exitosamente");
     }
 

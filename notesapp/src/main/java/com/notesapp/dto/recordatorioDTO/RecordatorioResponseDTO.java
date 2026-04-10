@@ -1,6 +1,6 @@
 package com.notesapp.dto.recordatorioDTO;
 
-import com.notesapp.entity.Prioridad;
+import com.notesapp.enums.Prioridad;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

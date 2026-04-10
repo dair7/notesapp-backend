@@ -20,6 +20,9 @@ public interface AdminService {
     // Listar usuarios paginados incluyendo cantidad de notas de cada uno
     PageResponseDTO<UsuarioResponseDTO> listarUsuariosConDetalles(int page, int size);
 
+    // Crear un usuario normal desde el panel admin con envío de credenciales por correo
+    UsuarioResponseDTO crearUsuario(UsuarioRequestDTO dto);
+
     // Editar nombre y email de cualquier usuario
     UsuarioResponseDTO actualizarUsuario(Long id, UsuarioRequestDTO dto);
 

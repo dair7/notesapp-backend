@@ -1,4 +1,4 @@
-package com.notesapp.entity;
+package com.notesapp.enums;
 
 public enum Prioridad {
     ALTA,

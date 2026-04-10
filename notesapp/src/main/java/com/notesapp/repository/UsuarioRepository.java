@@ -10,12 +10,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     // Creará la consulta automaticamente solo con el nombre del metodo
     Optional<Usuario> findByEmail(String email);
+
+    // Lista paginada excluyendo un rol (para ocultar SUPER_ADMIN del panel)
+    Page<Usuario> findByRoleNot(RoleType role, Pageable pageable);
 
     boolean existsByEmail(String email);
 

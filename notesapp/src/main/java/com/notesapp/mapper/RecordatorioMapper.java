@@ -12,7 +12,7 @@ public class RecordatorioMapper {
         Recordatorio recordatorio = new Recordatorio();
         recordatorio.setFecha(dto.getFecha());
         recordatorio.setNota(nota);
-        recordatorio.setPrioridad(dto.getPrioridad() != null ? dto.getPrioridad() : com.notesapp.entity.Prioridad.MEDIA);
+        recordatorio.setPrioridad(dto.getPrioridad() != null ? dto.getPrioridad() : com.notesapp.enums.Prioridad.MEDIA);
 
         return recordatorio;
     }

@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final UsuarioService usuarioService;
@@ -58,17 +58,22 @@ public class AdminController {
         return ResponseEntity.ok(usuarioService.obtenerPorId(id));
     }
 
-    // ── Crear un nuevo administrador (SOLO SUPER_ADMIN) ──
-    @PostMapping("/usuarios")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    // ── Crear un nuevo administrador (ADMIN) ─────────────
+    @PostMapping("/usuarios/admin")
     public ResponseEntity<UsuarioResponseDTO> crearAdmin(
             @Valid @RequestBody UsuarioRequestDTO dto) {
         return ResponseEntity.ok(usuarioService.crearAdmin(dto));
     }
 
-    // ── Cambiar rol de un usuario (SOLO SUPER_ADMIN) ─────
+    // ── Crear un usuario normal con envío de credenciales por correo ──
+    @PostMapping("/usuarios/usuario")
+    public ResponseEntity<UsuarioResponseDTO> crearUsuario(
+            @Valid @RequestBody UsuarioRequestDTO dto) {
+        return ResponseEntity.ok(adminService.crearUsuario(dto));
+    }
+
+    // ── Cambiar rol de un usuario (ADMIN) ─────────────────
     @PatchMapping("/usuarios/{id}/rol")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<UsuarioResponseDTO> cambiarRol(
             @PathVariable Long id,
             @RequestParam RoleType rol) {

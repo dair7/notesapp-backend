@@ -21,20 +21,20 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(name = "role", nullable = false, length = 30)
     private RoleType role = RoleType.USER;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "is_verified", nullable = false, columnDefinition = "boolean default false")
     private boolean isVerified = false;
 
     // Estado de la cuenta: ACTIVO (puede entrar) / INACTIVO (baja lógica)

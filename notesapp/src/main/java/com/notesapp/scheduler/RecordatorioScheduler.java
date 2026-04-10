@@ -13,7 +13,8 @@ import java.util.List;
 
 /**
  * Scheduler que revisa cada minuto si hay recordatorios cuya fecha ya llegó.
- * Por cada recordatorio vencido: envía un email al usuario y lo marca como completado.
+ * Por cada recordatorio vencido lo marca como completado en BD.
+ * Las notificaciones al usuario son responsabilidad de la app Flutter (notificaciones locales).
  */
 @Component
 public class RecordatorioScheduler {

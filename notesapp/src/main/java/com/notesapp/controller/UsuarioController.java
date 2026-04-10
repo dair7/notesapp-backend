@@ -33,15 +33,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.obtenerTodos());
     }
 
-    // ── Cambiar rol (Solo ADMIN) ─────────────────────────
-    @PatchMapping("/{id}/rol")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UsuarioResponseDTO> cambiarRol(
-            @PathVariable Long id,
-            @RequestParam com.notesapp.enums.RoleType nuevoRol) {
-        return ResponseEntity.ok(usuarioService.cambiarRol(id, nuevoRol));
-    }
-
     // ── Eliminar usuario (Solo ADMIN) ────────────────────
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

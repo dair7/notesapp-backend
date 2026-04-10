@@ -17,6 +17,7 @@ import com.notesapp.repository.NotaRepository;
 import com.notesapp.repository.RecordatorioRepository;
 import com.notesapp.repository.UsuarioRepository;
 import com.notesapp.service.interfaz.AdminService;
+import com.notesapp.service.interfaz.EmailService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,15 +37,18 @@ public class AdminServiceImpl implements AdminService {
     private final NotaRepository notaRepository;
     private final RecordatorioRepository recordatorioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public AdminServiceImpl(UsuarioRepository usuarioRepository,
                             NotaRepository notaRepository,
                             RecordatorioRepository recordatorioRepository,
-                            PasswordEncoder passwordEncoder) {
+                            PasswordEncoder passwordEncoder,
+                            EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.notaRepository = notaRepository;
         this.recordatorioRepository = recordatorioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
@@ -115,7 +119,8 @@ public class AdminServiceImpl implements AdminService {
     public PageResponseDTO<UsuarioResponseDTO> listarUsuariosConDetalles(int page, int size) {
         // Ordenar por fecha de creación descendente (más recientes primero)
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Usuario> paginaUsuarios = usuarioRepository.findAll(pageable);
+        // Excluir SUPER_ADMIN — solo existe en BD, no debe aparecer en el panel
+        Page<Usuario> paginaUsuarios = usuarioRepository.findByRoleNot(RoleType.SUPER_ADMIN, pageable);
 
         List<UsuarioResponseDTO> contenido = paginaUsuarios.getContent().stream()
                 .map(u -> {
@@ -131,6 +136,28 @@ public class AdminServiceImpl implements AdminService {
                 paginaUsuarios.getTotalPages(),
                 paginaUsuarios.getTotalElements()
         );
+    }
+
+    @Override
+    public UsuarioResponseDTO crearUsuario(UsuarioRequestDTO dto) {
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new EmailAlreadyExistsException(dto.getEmail());
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.getNombre());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+        usuario.setRole(RoleType.USER);
+        usuario.setVerified(true);
+        usuario.setEstadoUsuario(EstadoUsuario.ACTIVO);
+
+        usuarioRepository.save(usuario);
+
+        // Enviar credenciales al correo del nuevo usuario
+        emailService.sendCredencialesEmail(dto.getEmail(), dto.getNombre(), dto.getPassword());
+
+        return UsuarioMapper.toResponseDTO(usuario);
     }
 
     @Override

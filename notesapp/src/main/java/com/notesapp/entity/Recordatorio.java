@@ -1,5 +1,6 @@
 package com.notesapp.entity;
 
+import com.notesapp.enums.Prioridad;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -19,14 +21,14 @@ public class Recordatorio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(name = "completado", columnDefinition = "boolean default false")
     private Boolean completado = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'MEDIA'")
+    @Column(name = "prioridad", nullable = false, columnDefinition = "varchar(10) default 'MEDIA'")
     private Prioridad prioridad = Prioridad.MEDIA;
 
     @ManyToOne(fetch = FetchType.LAZY)

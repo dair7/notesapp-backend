@@ -1,6 +1,6 @@
 package com.notesapp.dto.recordatorioDTO;
 
-import com.notesapp.entity.Prioridad;
+import com.notesapp.enums.Prioridad;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

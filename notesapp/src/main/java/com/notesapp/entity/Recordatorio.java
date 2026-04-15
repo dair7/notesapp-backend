@@ -24,9 +24,11 @@ public class Recordatorio {
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
 
+    @Builder.Default
     @Column(name = "completado", columnDefinition = "boolean default false")
     private Boolean completado = false;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "prioridad", nullable = false, columnDefinition = "varchar(10) default 'MEDIA'")
     private Prioridad prioridad = Prioridad.MEDIA;

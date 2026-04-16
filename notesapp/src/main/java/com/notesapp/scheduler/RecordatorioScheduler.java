@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -30,8 +31,9 @@ public class RecordatorioScheduler {
     @Scheduled(fixedRate = 60000) // se ejecuta cada 60 segundos
     @Transactional
     public void procesarRecordatoriosVencidos() {
+        // Usar UTC explícitamente para que coincida con las fechas almacenadas en UTC
         List<Recordatorio> vencidos = recordatorioRepository
-                .findVencidosYPendientes(LocalDateTime.now());
+                .findVencidosYPendientes(LocalDateTime.now(ZoneOffset.UTC));
 
         if (vencidos.isEmpty()) return;
 

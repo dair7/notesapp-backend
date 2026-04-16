@@ -5,12 +5,16 @@ import com.notesapp.dto.recordatorioDTO.RecordatorioResponseDTO;
 import com.notesapp.entity.Nota;
 import com.notesapp.entity.Recordatorio;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 public class RecordatorioMapper {
 
     public static Recordatorio toEntity(RecordatorioRequestDTO dto, Nota nota) {
 
         Recordatorio recordatorio = new Recordatorio();
-        recordatorio.setFecha(dto.getFecha());
+        // Normalizar a UTC para que el scheduler (también en UTC) compare correctamente
+        recordatorio.setFecha(LocalDateTime.ofInstant(dto.getFecha().toInstant(), ZoneOffset.UTC));
         recordatorio.setNota(nota);
         recordatorio.setPrioridad(dto.getPrioridad() != null ? dto.getPrioridad() : com.notesapp.enums.Prioridad.MEDIA);
 

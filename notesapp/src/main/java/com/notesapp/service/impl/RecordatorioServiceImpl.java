@@ -14,6 +14,8 @@ import com.notesapp.security.SecurityUtils;
 import com.notesapp.service.interfaz.RecordatorioService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,7 +98,8 @@ public class RecordatorioServiceImpl implements RecordatorioService {
 
         verificarPropietarioNota(recordatorio.getNota());
 
-        recordatorio.setFecha(dto.getFecha());
+        // Convertir OffsetDateTime (con zona horaria de Flutter) a LocalDateTime UTC
+        recordatorio.setFecha(LocalDateTime.ofInstant(dto.getFecha().toInstant(), ZoneOffset.UTC));
         Recordatorio actualizado = recordatorioRepository.save(recordatorio);
         return RecordatorioMapper.toResponseDTO(actualizado);
     }

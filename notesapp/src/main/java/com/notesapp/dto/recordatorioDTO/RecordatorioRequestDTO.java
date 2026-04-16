@@ -6,15 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecordatorioRequestDTO {
 
+    // OffsetDateTime acepta strings con zona horaria (ej. "...Z" UTC) que envía Flutter
     @NotNull(message = "La fecha de la tarea es obligatoria")
-    private LocalDateTime fecha;
+    private OffsetDateTime fecha;
 
     private Prioridad prioridad = Prioridad.MEDIA;
 }

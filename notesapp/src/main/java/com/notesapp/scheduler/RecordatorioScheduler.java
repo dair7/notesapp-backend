@@ -13,9 +13,9 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 /**
- * Scheduler que revisa cada minuto si hay recordatorios cuya fecha ya llegó.
- * Por cada recordatorio vencido lo marca como completado en BD.
- * Las notificaciones al usuario son responsabilidad de la app Flutter (notificaciones locales).
+ * Scheduler que revisa periódicamente recordatorios vencidos y los registra en log.
+ * NO marca automáticamente como completados — esa acción es exclusiva del usuario.
+ * Las notificaciones locales son responsabilidad de la app Flutter.
  */
 @Component
 public class RecordatorioScheduler {
@@ -29,28 +29,14 @@ public class RecordatorioScheduler {
     }
 
     @Scheduled(fixedRate = 60000) // se ejecuta cada 60 segundos
-    @Transactional
-    public void procesarRecordatoriosVencidos() {
-        // Usar UTC explícitamente para que coincida con las fechas almacenadas en UTC
+    @Transactional(readOnly = true)
+    public void reportarRecordatoriosVencidos() {
+        // Usar UTC para que coincida con las fechas almacenadas en UTC
         List<Recordatorio> vencidos = recordatorioRepository
                 .findVencidosYPendientes(LocalDateTime.now(ZoneOffset.UTC));
 
-        if (vencidos.isEmpty()) return;
-
-        log.info("Procesando {} recordatorio(s) vencido(s)", vencidos.size());
-
-        for (Recordatorio recordatorio : vencidos) {
-            try {
-                // Marcar como completado para mantener el estado sincronizado en BD
-                recordatorio.setCompletado(true);
-                recordatorioRepository.save(recordatorio);
-
-                log.info("Recordatorio {} marcado como completado", recordatorio.getId());
-
-            } catch (Exception e) {
-                // Fallo individual no detiene el procesamiento del resto
-                log.error("Error al procesar recordatorio {}: {}", recordatorio.getId(), e.getMessage(), e);
-            }
+        if (!vencidos.isEmpty()) {
+            log.info("{} recordatorio(s) vencido(s) pendiente(s) de acción del usuario", vencidos.size());
         }
     }
 }

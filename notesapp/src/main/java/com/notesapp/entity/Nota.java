@@ -32,7 +32,7 @@ public class Nota {
     private LocalDateTime fechaCreacion;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false, columnDefinition = "varchar(20) default 'ACTIVA'")
+    @Column(name = "estado", length = 20)
     private EstadoNoteType estado = EstadoNoteType.ACTIVA;
 
     @Column(name = "es_anclada", nullable = false, columnDefinition = "boolean default false")

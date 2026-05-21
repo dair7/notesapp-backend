@@ -38,7 +38,7 @@ COPY --from=build /app/target/*.jar app.jar
 USER appuser
 
 # Render asigna el puerto via variable de entorno PORT
-EXPOSE 10000
+EXPOSE
 
 # Variables de entorno con valores por defecto (se sobreescriben en Render)
 ENV JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseContainerSupport"

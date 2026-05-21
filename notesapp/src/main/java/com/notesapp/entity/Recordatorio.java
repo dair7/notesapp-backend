@@ -30,7 +30,7 @@ public class Recordatorio {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "prioridad", nullable = false, columnDefinition = "varchar(10) default 'MEDIA'")
+    @Column(name = "prioridad", nullable = false, length = 10)
     private Prioridad prioridad = Prioridad.MEDIA;
 
     @ManyToOne(fetch = FetchType.LAZY)

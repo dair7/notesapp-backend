@@ -10,6 +10,7 @@ import com.notesapp.exception.ResourceNotFoundException;
 import com.notesapp.mapper.NotaMapper;
 import com.notesapp.repository.NotaRepository;
 import com.notesapp.repository.UsuarioRepository;
+import com.notesapp.repository.CategoriaRepository;
 import com.notesapp.security.SecurityUtils;
 import com.notesapp.service.interfaz.NotaService;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,14 @@ public class NotaServiceImpl implements NotaService {
 
     private final NotaRepository notaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CategoriaRepository categoriaRepository;
 
     public NotaServiceImpl(NotaRepository notaRepository,
-                           UsuarioRepository usuarioRepository) {
+                           UsuarioRepository usuarioRepository,
+                           CategoriaRepository categoriaRepository) {
         this.notaRepository = notaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     @Override
@@ -38,6 +42,13 @@ public class NotaServiceImpl implements NotaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId));
 
         Nota nota = NotaMapper.toEntity(dto, usuario);
+        
+        if (dto.getCategoriaId() != null) {
+            com.notesapp.entity.Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria", "id", dto.getCategoriaId()));
+            nota.setCategoria(categoria);
+        }
+        
         Nota notaGuardada = notaRepository.save(nota);
         return NotaMapper.toResponseDTO(notaGuardada);
     }
@@ -103,6 +114,14 @@ public class NotaServiceImpl implements NotaService {
         nota.setContenido(dto.getContenido());
         nota.setColor(dto.getColor());
         nota.setEtiquetas(dto.getEtiquetas());
+        
+        if (dto.getCategoriaId() != null) {
+            com.notesapp.entity.Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria", "id", dto.getCategoriaId()));
+            nota.setCategoria(categoria);
+        } else {
+            nota.setCategoria(null);
+        }
 
         Nota notaActualizada = notaRepository.save(nota);
         return NotaMapper.toResponseDTO(notaActualizada);

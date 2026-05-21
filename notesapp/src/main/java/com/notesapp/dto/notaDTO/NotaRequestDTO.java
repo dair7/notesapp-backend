@@ -22,4 +22,7 @@ public class NotaRequestDTO {
 
     // Etiquetas separadas por coma, opcional
     private String etiquetas;
+
+    // ID de la categoría a la que pertenece la nota, opcional
+    private Long categoriaId;
 }

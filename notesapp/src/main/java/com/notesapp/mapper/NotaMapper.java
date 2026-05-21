@@ -36,6 +36,12 @@ public class NotaMapper {
             dto.setUsuarioNombre(nota.getUsuario().getNombre());
         }
 
+        if (nota.getCategoria() != null) {
+            dto.setCategoriaId(nota.getCategoria().getId());
+            dto.setCategoriaNombre(nota.getCategoria().getNombre());
+            dto.setCategoriaColor(nota.getCategoria().getColorHex());
+        }
+
         return dto;
     }
 }

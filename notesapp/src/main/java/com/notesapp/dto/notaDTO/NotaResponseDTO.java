@@ -22,4 +22,8 @@ public class NotaResponseDTO {
     private String usuarioNombre;
     private String color;
     private String etiquetas;
+    
+    private Long categoriaId;
+    private String categoriaNombre;
+    private String categoriaColor;
 }
